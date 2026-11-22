@@ -1,0 +1,21 @@
+.alerta {
+    padding: 0.6rem 0.8rem;
+    font: 400 0.95rem/1.4 var(--fuente-texto);
+    color: var(--color-error-claro);
+    background: rgb(255 255 255 / 0.06);
+    border-left: 3px solid currentColor;
+    border-radius: 0 6px 6px 0;
+}
+
+.alerta--exito {
+    color: var(--color-exito-claro);
+}
+
+.alerta--claro {
+    color: var(--color-error);
+    background: rgb(0 0 0 / 0.04);
+}
+
+.alerta--claro.alerta--exito {
+    color: var(--color-exito);
+}

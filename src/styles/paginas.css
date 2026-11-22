@@ -1,0 +1,76 @@
+/* Estructura común de las pantallas internas sobre fondo crema (perfil, administración) */
+.pagina {
+    display: block;
+    min-height: calc(100dvh - var(--altura-navbar));
+    padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+    background: var(--color-crema);
+}
+
+.pagina__contenido {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    width: min(var(--ancho-pagina, 720px), 100%);
+    margin-inline: auto;
+}
+
+.pagina__etiqueta {
+    font: 600 0.75rem/1 var(--fuente-texto);
+    letter-spacing: 0.2em;
+    color: var(--color-tan);
+}
+
+.pagina__titulo {
+    margin-top: 0.6rem;
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    line-height: 1.05;
+    color: var(--color-verde);
+}
+
+.pagina__texto {
+    margin-top: 0.6rem;
+    font: 400 1.125rem/1.4 var(--fuente-texto);
+    color: var(--color-tan);
+}
+
+.tarjeta-clara {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 4vw, 2.75rem);
+    color: var(--color-verde);
+    background: var(--color-marfil);
+    border: 2px solid rgb(58 79 65 / 0.2);
+    border-radius: var(--radio-tarjeta);
+    box-shadow: 0 10px 40px rgb(58 79 65 / 0.08);
+}
+
+.pagina__estado {
+    padding: 2rem 0;
+    font: 400 1rem/1.4 var(--fuente-texto);
+    text-align: center;
+    color: var(--color-tan);
+}
+
+/* Etiquetas de rol y estado */
+.insignia {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.75rem;
+    font: 600 0.75rem/1.2 var(--fuente-texto);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-verde);
+    background: rgb(58 79 65 / 0.1);
+    border-radius: 999px;
+}
+
+.insignia--activa {
+    color: var(--color-exito);
+    background: rgb(47 106 71 / 0.12);
+}
+
+.insignia--inactiva {
+    color: var(--color-error);
+    background: rgb(155 58 43 / 0.1);
+}

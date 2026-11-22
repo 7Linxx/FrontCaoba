@@ -1,0 +1,154 @@
+<app-auth-tarjeta [formularioIzquierda]="false">
+    <div panel-info class="auth-info auth-info--izquierda">
+        <div class="auth-info__cabecera">
+            <p class="auth-marca">CAOBA</p>
+            <h1 class="auth-titulo">¡Comencemos!</h1>
+        </div>
+
+        <p class="auth-eslogan">
+            Encuentra las mejores estancias privadas y acogedoras en el lugar que quieras y simplemente
+            relájate...
+        </p>
+    </div>
+
+    <div panel-formulario class="auth-panel">
+        <h2 class="auth-titulo-formulario">¡Regístrate!</h2>
+
+        @if (ok()) {
+            <app-alerta tipo="exito">{{ ok() }}</app-alerta>
+        }
+
+        @if (error()) {
+            <app-alerta>{{ error() }}</app-alerta>
+        }
+
+        <form class="auth-formulario" [formGroup]="formulario" (ngSubmit)="crear()" novalidate>
+            <div class="auth-fila-doble">
+                <div class="campo">
+                    <input
+                            class="campo__entrada"
+                            type="text"
+                            formControlName="nombre"
+                            placeholder="Nombre"
+                            aria-label="Nombre"
+                            maxlength="100"
+                            autocomplete="given-name"
+                            [attr.aria-invalid]="invalido('nombre')">
+
+                    @if (invalido('nombre')) {
+                        <small class="campo__error">El nombre es obligatorio.</small>
+                    }
+                </div>
+
+                <div class="campo">
+                    <input
+                            class="campo__entrada"
+                            type="text"
+                            formControlName="apellido"
+                            placeholder="Apellido"
+                            aria-label="Apellido"
+                            maxlength="100"
+                            autocomplete="family-name"
+                            [attr.aria-invalid]="invalido('apellido')">
+
+                    @if (invalido('apellido')) {
+                        <small class="campo__error">El apellido es obligatorio.</small>
+                    }
+                </div>
+            </div>
+
+            <div class="campo">
+                <input
+                        class="campo__entrada"
+                        type="email"
+                        formControlName="correo"
+                        placeholder="Tu correo electrónico"
+                        aria-label="Correo electrónico"
+                        maxlength="150"
+                        autocomplete="email"
+                        [attr.aria-invalid]="invalido('correo')">
+
+                @if (invalido('correo')) {
+                    <small class="campo__error">
+                        @if (formulario.controls.correo.hasError('required')) {
+                            El correo electrónico es obligatorio.
+                        } @else {
+                            Ingresa un correo electrónico válido.
+                        }
+                    </small>
+                }
+            </div>
+
+            <div class="campo">
+                <input
+                        class="campo__entrada"
+                        type="password"
+                        formControlName="contrasena"
+                        placeholder="Crea tu contraseña"
+                        aria-label="Contraseña"
+                        autocomplete="new-password"
+                        [attr.aria-invalid]="invalido('contrasena')">
+
+                @if (invalido('contrasena')) {
+                    <small class="campo__error">
+                        @if (formulario.controls.contrasena.hasError('required')) {
+                            La contraseña es obligatoria.
+                        } @else {
+                            Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
+                        }
+                    </small>
+                } @else {
+                    <small class="campo__ayuda">
+                        Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
+                    </small>
+                }
+            </div>
+
+            <div class="campo">
+                <input
+                        class="campo__entrada"
+                        type="password"
+                        formControlName="confirmacion"
+                        placeholder="Repite tu contraseña"
+                        aria-label="Repite tu contraseña"
+                        autocomplete="new-password"
+                        [attr.aria-invalid]="invalido('confirmacion') || noCoinciden()">
+
+                @if (invalido('confirmacion')) {
+                    <small class="campo__error">Confirma tu contraseña.</small>
+                } @else if (noCoinciden()) {
+                    <small class="campo__error">Las contraseñas no coinciden.</small>
+                }
+            </div>
+
+            <div class="campo">
+                <label class="campo__etiqueta" for="rol">Tipo de cuenta</label>
+                <select id="rol" class="campo__entrada" formControlName="rol">
+                    @for (rol of roles; track rol.valor) {
+                        <option [value]="rol.valor">{{ rol.etiqueta }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="campo">
+                <label class="campo-check">
+                    <input type="checkbox" formControlName="aceptaTratamientoDatos">
+                    <span>Acepto el tratamiento de mis datos personales.</span>
+                </label>
+
+                @if (invalido('aceptaTratamientoDatos')) {
+                    <small class="campo__error">Debes aceptar el tratamiento de datos personales.</small>
+                }
+            </div>
+
+            <button class="boton boton--relleno boton--auth" type="submit" [disabled]="cargando()">
+                {{ cargando() ? 'Creando cuenta…' : 'Crear cuenta' }}
+            </button>
+        </form>
+
+        <p class="auth-pie">
+            ¿Ya eres miembro?
+            <a class="enlace" routerLink="/login">Inicia sesión aquí</a>
+        </p>
+    </div>
+</app-auth-tarjeta>

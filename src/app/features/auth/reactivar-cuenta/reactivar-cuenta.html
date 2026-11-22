@@ -1,0 +1,71 @@
+<app-auth-tarjeta>
+    <div panel-formulario class="auth-panel">
+        <h2 class="auth-titulo-formulario">Reactiva tu cuenta</h2>
+
+        <p class="auth-texto">
+            Ingresa tu correo y tu contraseña actual para volver a activar tu cuenta.
+        </p>
+
+        @if (error()) {
+            <app-alerta>{{ error() }}</app-alerta>
+        }
+
+        <form class="auth-formulario" [formGroup]="formulario" (ngSubmit)="reactivar()" novalidate>
+            <div class="campo">
+                <input
+                        class="campo__entrada"
+                        type="email"
+                        formControlName="correo"
+                        placeholder="Ingresa tu correo"
+                        aria-label="Correo electrónico"
+                        autocomplete="username"
+                        [attr.aria-invalid]="invalido('correo')">
+
+                @if (invalido('correo')) {
+                    <small class="campo__error">
+                        @if (formulario.controls.correo.hasError('required')) {
+                            El correo electrónico es obligatorio.
+                        } @else {
+                            Ingresa un correo electrónico válido.
+                        }
+                    </small>
+                }
+            </div>
+
+            <div class="campo">
+                <input
+                        class="campo__entrada"
+                        type="password"
+                        formControlName="contrasena"
+                        placeholder="Ingresa tu contraseña actual"
+                        aria-label="Contraseña actual"
+                        autocomplete="current-password"
+                        [attr.aria-invalid]="invalido('contrasena')">
+
+                @if (invalido('contrasena')) {
+                    <small class="campo__error">La contraseña es obligatoria.</small>
+                }
+            </div>
+
+            <button class="boton boton--relleno boton--auth" type="submit" [disabled]="cargando()">
+                {{ cargando() ? 'Reactivando…' : 'Reactivar cuenta' }}
+            </button>
+        </form>
+
+        <p class="auth-pie">
+            <a class="enlace" routerLink="/login">Volver al inicio de sesión</a>
+        </p>
+    </div>
+
+    <div panel-info class="auth-info auth-info--derecha">
+        <div class="auth-info__cabecera">
+            <p class="auth-marca">CAOBA</p>
+            <h1 class="auth-titulo">¡Hola de nuevo!</h1>
+        </div>
+
+        <p class="auth-eslogan">
+            Encuentra las mejores estancias privadas y acogedoras en el lugar que quieras y simplemente
+            relájate...
+        </p>
+    </div>
+</app-auth-tarjeta>

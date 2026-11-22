@@ -1,0 +1,30 @@
+.perfil__formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.perfil__fila {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.perfil__datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.perfil__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 560px) {
+    .perfil__fila {
+        grid-template-columns: 1fr;
+    }
+}

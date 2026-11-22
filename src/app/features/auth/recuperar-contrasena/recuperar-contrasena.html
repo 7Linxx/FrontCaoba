@@ -1,0 +1,205 @@
+<app-auth-tarjeta>
+    <div panel-formulario class="auth-panel">
+        <h2 class="auth-titulo-formulario">¿Olvidaste tu contraseña?</h2>
+
+        @if (mensaje()) {
+            <app-alerta tipo="exito">{{ mensaje() }}</app-alerta>
+        }
+
+        @if (error()) {
+            <app-alerta>{{ error() }}</app-alerta>
+        }
+
+        @switch (paso()) {
+            @case ('correo') {
+                <p class="auth-texto">
+                    Escribe el correo con el que te registraste y te enviaremos un código de verificación
+                    para crear una nueva contraseña.
+                </p>
+
+                <form
+                        class="auth-formulario"
+                        [formGroup]="formCorreo"
+                        (ngSubmit)="enviarCodigo()"
+                        novalidate>
+                    <div class="campo">
+                        <input
+                                class="campo__entrada"
+                                type="email"
+                                formControlName="correo"
+                                placeholder="Tu correo electrónico"
+                                aria-label="Correo electrónico"
+                                maxlength="150"
+                                autocomplete="email"
+                                [attr.aria-invalid]="enviadoCorreo() && formCorreo.controls.correo.invalid">
+
+                        @if (enviadoCorreo() && formCorreo.controls.correo.invalid) {
+                            <small class="campo__error">
+                                @if (formCorreo.controls.correo.hasError('required')) {
+                                    El correo electrónico es obligatorio.
+                                } @else {
+                                    Ingresa un correo válido, por ejemplo: nombre&#64;dominio.com
+                                }
+                            </small>
+                        }
+                    </div>
+
+                    <button class="boton boton--relleno boton--auth" type="submit" [disabled]="cargando()">
+                        {{ cargando() ? 'Enviando…' : 'Enviar código' }}
+                    </button>
+                </form>
+            }
+
+            @case ('enviado') {
+                <p class="auth-texto">
+                    Enviamos el código a <strong>{{ correo() }}</strong>. ¿Ya te llegó el correo?
+                </p>
+
+                <div class="auth-acciones">
+                    <button class="boton boton--relleno boton--auth" type="button" (click)="irACodigo()">
+                        Ya lo recibí
+                    </button>
+
+                    <button
+                            class="boton auth-boton-secundario boton--auth"
+                            type="button"
+                            [disabled]="cargando() || espera() > 0"
+                            (click)="reenviar()">
+                        {{ textoReenviar() }}
+                    </button>
+
+                    <button class="boton--enlace" type="button" (click)="cambiarCorreo()">
+                        Usar otro correo
+                    </button>
+                </div>
+            }
+
+            @case ('codigo') {
+                <p class="auth-texto">
+                    Escribe el código de 6 dígitos que enviamos a <strong>{{ correo() }}</strong>.
+                </p>
+
+                <form
+                        class="auth-formulario"
+                        [formGroup]="formCodigo"
+                        (ngSubmit)="validarCodigo()"
+                        novalidate>
+                    <div class="campo">
+                        <input
+                                class="campo__entrada"
+                                type="text"
+                                formControlName="codigo"
+                                placeholder="000000"
+                                aria-label="Código de verificación"
+                                maxlength="6"
+                                inputmode="numeric"
+                                autocomplete="one-time-code"
+                                [attr.aria-invalid]="enviadoCodigo() && formCodigo.controls.codigo.invalid">
+
+                        @if (enviadoCodigo() && formCodigo.controls.codigo.invalid) {
+                            <small class="campo__error">
+                                @if (formCodigo.controls.codigo.hasError('required')) {
+                                    Ingresa el código que llegó a tu correo.
+                                } @else {
+                                    El código tiene 6 números.
+                                }
+                            </small>
+                        }
+                    </div>
+
+                    <button class="boton boton--relleno boton--auth" type="submit" [disabled]="cargando()">
+                        {{ cargando() ? 'Validando…' : 'Validar código' }}
+                    </button>
+                </form>
+
+                <div class="auth-acciones">
+                    <button
+                            class="boton auth-boton-secundario boton--auth"
+                            type="button"
+                            [disabled]="cargando() || espera() > 0"
+                            (click)="reenviar()">
+                        {{ textoReenviar() }}
+                    </button>
+                </div>
+            }
+
+            @case ('clave') {
+                <p class="auth-texto">Código verificado. Ahora crea tu nueva contraseña.</p>
+
+                <form
+                        class="auth-formulario"
+                        [formGroup]="formClave"
+                        (ngSubmit)="actualizarClave()"
+                        novalidate>
+                    <div class="campo">
+                        <input
+                                class="campo__entrada"
+                                type="password"
+                                formControlName="clave"
+                                placeholder="Nueva contraseña"
+                                aria-label="Nueva contraseña"
+                                autocomplete="new-password"
+                                [attr.aria-invalid]="enviadoClave() && formClave.controls.clave.invalid">
+
+                        @if (enviadoClave() && formClave.controls.clave.invalid) {
+                            <small class="campo__error">
+                                @if (formClave.controls.clave.hasError('required')) {
+                                    La contraseña es obligatoria.
+                                } @else {
+                                    Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
+                                }
+                            </small>
+                        } @else {
+                            <small class="campo__ayuda">
+                                Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
+                            </small>
+                        }
+                    </div>
+
+                    <div class="campo">
+                        <input
+                                class="campo__entrada"
+                                type="password"
+                                formControlName="confirmacion"
+                                placeholder="Repite tu contraseña"
+                                aria-label="Confirmar contraseña"
+                                autocomplete="new-password"
+                                [attr.aria-invalid]="
+                enviadoClave() &&
+                (formClave.controls.confirmacion.invalid || formClave.hasError('noCoinciden'))
+              ">
+
+                        @if (enviadoClave() && formClave.controls.confirmacion.hasError('required')) {
+                            <small class="campo__error">Confirma tu contraseña.</small>
+                        } @else if (enviadoClave() && formClave.hasError('noCoinciden')) {
+                            <small class="campo__error">Las contraseñas no coinciden.</small>
+                        }
+                    </div>
+
+                    <button class="boton boton--relleno boton--auth" type="submit" [disabled]="cargando()">
+                        {{ cargando() ? 'Actualizando…' : 'Actualizar contraseña' }}
+                    </button>
+                </form>
+            }
+
+            @case ('listo') {
+                <p class="auth-texto">Te llevaremos al inicio de sesión en unos segundos…</p>
+            }
+        }
+
+        <p class="auth-pie">
+            <a class="enlace" routerLink="/login">Volver al inicio de sesión</a>
+        </p>
+    </div>
+
+    <div panel-info class="auth-info auth-info--derecha">
+        <div class="auth-info__cabecera">
+            <p class="auth-marca">CAOBA</p>
+            <h1 class="auth-titulo">¡Recupera tu acceso!</h1>
+        </div>
+
+        <p class="auth-eslogan">
+            Te enviaremos un código de verificación a tu correo para que crees una nueva contraseña.
+        </p>
+    </div>
+</app-auth-tarjeta>

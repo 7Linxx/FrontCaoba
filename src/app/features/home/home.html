@@ -1,0 +1,74 @@
+<section class="hero">
+    <img class="hero__fondo" [src]="imagenes.inicioHero" alt="">
+
+    <div class="hero__contenido">
+        <h1 class="hero__titulo">¡Encuentra tu próxima historia!</h1>
+
+        <p class="hero__texto">
+            Busca el lugar,<br>
+            ¿Cuántos serán?<br>
+            ¿Cuándo será tu próxima historia?
+        </p>
+
+        <button class="boton boton--relleno hero__boton" type="button">
+            Explorar estancias
+        </button>
+    </div>
+</section>
+
+<section class="estancias">
+    <div class="estancias__principal">
+        <img
+                class="estancias__foto"
+                [src]="imagenes.estancias"
+                alt="Casas blancas y azules en una colina, con luces en la terraza">
+
+        <div class="estancias__texto">
+            <h2 class="estancias__titulo">Nuestras estancias</h2>
+
+            <p class="estancias__descripcion">
+                Aquí puedes quedarte, descansar y relajarte, porque en CAOBA elegimos para ti los lugares
+                más especiales e invaluables para disfrutar.
+            </p>
+
+            <button class="boton boton--contorno" type="button">Explorar</button>
+        </div>
+    </div>
+
+    <div class="estancias__franja">
+        @for (caracteristica of caracteristicas; track caracteristica.titulo) {
+            <article class="caracteristica">
+                <img class="caracteristica__imagen" [src]="caracteristica.imagen" alt="">
+
+                <div>
+                    <h3 class="caracteristica__titulo">{{ caracteristica.titulo }}</h3>
+                    <p class="caracteristica__texto">{{ caracteristica.descripcion }}</p>
+                </div>
+            </article>
+        }
+    </div>
+</section>
+
+<section class="destacados">
+    <div class="destacados__columna destacados__columna--a">
+        <h2 class="destacados__titulo">¡Los más gustados!</h2>
+
+        <img
+                class="destacados__imagen destacados__imagen--a"
+                [src]="imagenes.masGustados"
+                alt="Habitación luminosa con balcón y una cobija mostaza sobre la cama">
+
+        <button class="boton boton--contorno boton--contorno-claro" type="button">Explorar</button>
+    </div>
+
+    <div class="destacados__columna destacados__columna--b">
+        <h2 class="destacados__titulo">¡Para ti!</h2>
+
+        <img
+                class="destacados__imagen destacados__imagen--b"
+                [src]="imagenes.paraTi"
+                alt="Cabañas de madera en una colina rodeada de pinos">
+
+        <button class="boton boton--contorno boton--contorno-claro" type="button">Explorar</button>
+    </div>
+</section>

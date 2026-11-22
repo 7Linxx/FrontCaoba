@@ -1,0 +1,65 @@
+<div class="tabla-contenedor sobre-claro">
+    <table class="tabla">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol actual</th>
+            <th>Estado</th>
+            <th>Actualizar rol</th>
+            <th>Actualizar estado</th>
+        </tr>
+        </thead>
+
+        <tbody>
+            @for (usuario of usuarios(); track usuario.idUsuario) {
+                <tr>
+                    <td>
+                        <strong class="tabla__nombre">{{ usuario.nombre }} {{ usuario.apellido }}</strong>
+                    </td>
+
+                    <td>{{ usuario.correo }}</td>
+
+                    <td>{{ etiquetaRol(usuario) }}</td>
+
+                    <td>
+            <span
+                    class="insignia"
+                    [class.insignia--activa]="estaActiva(usuario)"
+                    [class.insignia--inactiva]="!estaActiva(usuario)">
+              {{ usuario.estadoCuenta }}
+            </span>
+                    </td>
+
+                    <td>
+                        <select
+                                class="campo__entrada tabla__select"
+                                [attr.aria-label]="'Rol de ' + usuario.nombre + ' ' + usuario.apellido"
+                                [attr.title]="esActual(usuario) ? 'No puedes modificar tu propia cuenta' : null"
+                                [disabled]="bloqueado(usuario)"
+                                (change)="alCambiarRol(usuario, $event)">
+                            @for (rol of roles; track rol.valor) {
+                                <option [value]="rol.valor" [selected]="rol.valor === rolActual(usuario)">
+                                    {{ rol.etiqueta }}
+                                </option>
+                            }
+                        </select>
+                    </td>
+
+                    <td>
+                        <button
+                                class="boton boton--compacto"
+                                type="button"
+                                [class.boton--peligro]="estaActiva(usuario)"
+                                [class.boton--relleno]="!estaActiva(usuario)"
+                                [attr.title]="esActual(usuario) ? 'No puedes modificar tu propia cuenta' : null"
+                                [disabled]="bloqueado(usuario)"
+                                (click)="estadoSolicitado.emit(usuario)">
+                            {{ estaActiva(usuario) ? 'Desactivar' : 'Activar' }}
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

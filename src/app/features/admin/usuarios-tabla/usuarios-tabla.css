@@ -1,0 +1,36 @@
+.tabla-contenedor {
+    overflow-x: auto;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font: 400 0.95rem/1.4 var(--fuente-texto);
+    color: var(--color-verde);
+}
+
+.tabla th {
+    padding: 0.75rem;
+    font: 600 0.75rem/1.2 var(--fuente-texto);
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    color: var(--color-tan);
+    border-bottom: 2px solid rgb(58 79 65 / 0.2);
+}
+
+.tabla td {
+    padding: 0.9rem 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgb(58 79 65 / 0.12);
+}
+
+.tabla__nombre {
+    font-weight: 500;
+}
+
+.tabla__select {
+    min-width: 150px;
+    font-size: 1rem;
+}

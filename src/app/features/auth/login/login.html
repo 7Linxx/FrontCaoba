@@ -1,0 +1,77 @@
+<app-auth-tarjeta>
+    <div panel-formulario class="auth-panel">
+        <h2 class="auth-titulo-formulario">¡Inicia sesión!</h2>
+
+        @if (error()) {
+            <app-alerta>{{ error() }}</app-alerta>
+        }
+
+        <form class="auth-formulario" [formGroup]="formulario" (ngSubmit)="entrar()" novalidate>
+            <div class="campo">
+                <input
+                        class="campo__entrada"
+                        type="email"
+                        formControlName="correo"
+                        placeholder="Ingresa tu correo"
+                        aria-label="Correo electrónico"
+                        autocomplete="username"
+                        [attr.aria-invalid]="invalido('correo')">
+
+                @if (invalido('correo')) {
+                    <small class="campo__error">
+                        @if (formulario.controls.correo.hasError('required')) {
+                            El correo electrónico es obligatorio.
+                        } @else {
+                            Ingresa un correo electrónico válido.
+                        }
+                    </small>
+                }
+            </div>
+
+            <div class="campo">
+                <input
+                        class="campo__entrada"
+                        type="password"
+                        formControlName="contrasena"
+                        placeholder="Ingresa tu contraseña"
+                        aria-label="Contraseña"
+                        autocomplete="current-password"
+                        [attr.aria-invalid]="invalido('contrasena')">
+
+                @if (invalido('contrasena')) {
+                    <small class="campo__error">La contraseña es obligatoria.</small>
+                }
+
+                <a class="enlace auth-enlace-secundario" routerLink="/recuperar">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </div>
+
+            <button class="boton boton--relleno boton--auth" type="submit" [disabled]="cargando()">
+                {{ cargando() ? 'Ingresando…' : 'Iniciar sesión' }}
+            </button>
+        </form>
+
+        <p class="auth-pie">
+            ¿No tienes cuenta?
+            <a class="enlace" routerLink="/registro">Regístrate aquí</a>
+        </p>
+
+        <p class="auth-pie">
+            ¿Desactivaste tu cuenta?
+            <a class="enlace" routerLink="/reactivar">Reactívala aquí</a>
+        </p>
+    </div>
+
+    <div panel-info class="auth-info auth-info--derecha">
+        <div class="auth-info__cabecera">
+            <p class="auth-marca">CAOBA</p>
+            <h1 class="auth-titulo">¡Bienvenido!</h1>
+        </div>
+
+        <p class="auth-eslogan">
+            Encuentra las mejores estancias privadas y acogedoras en el lugar que quieras y simplemente
+            relájate...
+        </p>
+    </div>
+</app-auth-tarjeta>

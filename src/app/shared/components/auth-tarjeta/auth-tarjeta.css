@@ -1,0 +1,58 @@
+:host {
+    display: block;
+}
+
+.fondo {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+    padding: 2rem 1rem;
+    background: var(--color-verde) url('/images/fondo_caoba.jpg') center / cover no-repeat;
+}
+
+.tarjeta {
+    display: grid;
+    grid-template-columns: 469fr 510fr;
+    width: min(968px, 100%);
+    min-height: 497px;
+    overflow: hidden;
+    color: var(--color-crema);
+    background: rgb(255 255 255 / 0.17);
+    border-radius: var(--radio-tarjeta);
+    backdrop-filter: blur(12px);
+}
+
+.tarjeta--invertida {
+    grid-template-columns: 510fr 469fr;
+}
+
+.tarjeta--invertida .panel--formulario {
+    order: 2;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.panel--formulario {
+    background: rgb(58 79 65 / 0.9);
+}
+
+@media (max-width: 800px) {
+    .tarjeta,
+    .tarjeta--invertida {
+        grid-template-columns: 1fr;
+    }
+
+    .panel--info {
+        order: 1;
+    }
+
+    .panel--formulario {
+        order: 2;
+    }
+}

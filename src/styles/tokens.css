@@ -1,0 +1,27 @@
+:root {
+    /* Paleta del prototipo (Figma) */
+    --color-verde: #3a4f41;
+    --color-verde-oscuro: #2e4035;
+    --color-tan: #9b8061;
+    --color-tan-oscuro: #86694c;
+    --color-crema: #f0e5da;
+    --color-marfil: #f6f0eb;
+    --color-cafe: #8c591f;
+
+    /* Mensajes: variantes para fondo oscuro y para fondo claro */
+    --color-error-claro: #f4b9a8;
+    --color-exito-claro: #cde5c0;
+    --color-error: #9b3a2b;
+    --color-exito: #2f6a47;
+
+    /* Tipografías */
+    --fuente-titulo: 'Libre Caslon Display', Georgia, serif;
+    --fuente-texto: 'Outfit', system-ui, sans-serif;
+    --fuente-script: 'Love Light', cursive;
+
+    /* Formas */
+    --radio-tarjeta: 29px;
+    --radio-boton-contorno: 26px;
+    --radio-imagen: 20px;
+    --altura-navbar: 72px;
+}

@@ -1,0 +1,83 @@
+<header class="navbar">
+    <a class="navbar__marca" routerLink="/inicio" aria-label="CAOBA, ir al inicio">
+        <img [src]="logo" alt="" height="44">
+    </a>
+
+    <button
+            class="navbar__menu"
+            type="button"
+            aria-controls="navegacion-principal"
+            [attr.aria-expanded]="menuAbierto()"
+            [attr.aria-label]="menuAbierto() ? 'Cerrar menú' : 'Abrir menú'"
+            (click)="alternarMenu()">
+        <span class="navbar__menu-linea"></span>
+        <span class="navbar__menu-linea"></span>
+        <span class="navbar__menu-linea"></span>
+    </button>
+
+    <nav
+            id="navegacion-principal"
+            class="navbar__navegacion"
+            [class.navbar__navegacion--abierta]="menuAbierto()"
+            aria-label="Principal">
+        <ul class="navbar__lista">
+            <li>
+                <a
+                        class="navbar__enlace"
+                        routerLink="/inicio"
+                        routerLinkActive="navbar__enlace--activo"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        (click)="cerrarMenu()">
+                    Inicio
+                </a>
+            </li>
+
+            @if (auth.esAdministrador()) {
+                <li>
+                    <a
+                            class="navbar__enlace"
+                            routerLink="/administracion/usuarios"
+                            routerLinkActive="navbar__enlace--activo"
+                            (click)="cerrarMenu()">
+                        Gestión de usuarios
+                    </a>
+                </li>
+            }
+
+            @if (auth.puedeVerReservasYReportes()) {
+                <li>
+          <span
+                  class="navbar__enlace navbar__enlace--deshabilitado"
+                  role="link"
+                  aria-disabled="true"
+                  title="Próximamente">
+            Reservas
+          </span>
+                </li>
+                <li>
+          <span
+                  class="navbar__enlace navbar__enlace--deshabilitado"
+                  role="link"
+                  aria-disabled="true"
+                  title="Próximamente">
+            Reportes
+          </span>
+                </li>
+            }
+        </ul>
+
+        <div class="navbar__cuenta">
+            <a
+                    class="navbar__enlace"
+                    routerLink="/perfil"
+                    routerLinkActive="navbar__enlace--activo"
+                    (click)="cerrarMenu()">
+                Perfil
+            </a>
+
+            <button class="boton boton--relleno" type="button" (click)="cerrarSesion()">
+                Cerrar sesión
+            </button>
+        </div>
+    </nav>
+</header>

@@ -1,0 +1,61 @@
+<div class="pagina__contenido admin">
+    <header>
+        <p class="pagina__etiqueta">ADMINISTRACIÓN DE CUENTAS</p>
+        <h1 class="pagina__titulo">Gestión de usuarios</h1>
+        <p class="pagina__texto">Consulta las cuentas de CAOBA y administra sus roles y estados.</p>
+    </header>
+
+    @if (error()) {
+        <app-alerta fondo="claro">{{ error() }}</app-alerta>
+    }
+
+    @if (mensaje()) {
+        <app-alerta tipo="exito" fondo="claro">{{ mensaje() }}</app-alerta>
+    }
+
+    <div class="admin__estadisticas">
+        <article class="estadistica">
+            <span class="estadistica__etiqueta">Usuarios registrados</span>
+            <strong class="estadistica__valor">{{ usuarios().length }}</strong>
+        </article>
+
+        <article class="estadistica">
+            <span class="estadistica__etiqueta">Cuentas activas</span>
+            <strong class="estadistica__valor">{{ activos() }}</strong>
+        </article>
+
+        <article class="estadistica">
+            <span class="estadistica__etiqueta">Cuentas inactivas</span>
+            <strong class="estadistica__valor">{{ inactivos() }}</strong>
+        </article>
+    </div>
+
+    <section class="tarjeta-clara">
+        <h2 class="admin__subtitulo">Usuarios registrados</h2>
+
+        @if (cargando()) {
+            <p class="pagina__estado">Consultando usuarios…</p>
+        } @else if (usuarios().length === 0) {
+            <p class="pagina__estado">
+                {{ error() ? 'No fue posible cargar los usuarios.' : 'No hay usuarios registrados.' }}
+            </p>
+        } @else {
+            <app-usuarios-tabla
+                    [usuarios]="usuarios()"
+                    [procesandoId]="procesandoId()"
+                    [idActual]="idActual()"
+                    (rolCambiado)="cambiarRol($event)"
+                    (estadoSolicitado)="solicitarCambioEstado($event)" />
+        }
+    </section>
+</div>
+
+<app-dialogo-confirmacion
+        [abierto]="pendiente() !== null"
+        [titulo]="tituloDialogo()"
+        [mensaje]="textoDialogo()"
+        [textoConfirmar]="desactivando() ? 'Desactivar' : 'Activar'"
+        [peligro]="desactivando()"
+        [cargando]="procesandoId() !== null"
+        (confirmar)="confirmarCambioEstado()"
+        (cancelar)="pendiente.set(null)" />

@@ -1,0 +1,121 @@
+<div class="pagina__contenido">
+    <header>
+        <p class="pagina__etiqueta">MI CUENTA</p>
+        <h1 class="pagina__titulo">Mi perfil</h1>
+        <p class="pagina__texto">Consulta y administra tu información personal en CAOBA.</p>
+    </header>
+
+    <section class="tarjeta-clara sobre-claro">
+        @if (error()) {
+            <app-alerta fondo="claro">{{ error() }}</app-alerta>
+        }
+
+        @if (mensaje()) {
+            <app-alerta tipo="exito" fondo="claro">{{ mensaje() }}</app-alerta>
+        }
+
+        @if (cargando()) {
+            <p class="pagina__estado">Consultando información del perfil…</p>
+        } @else if (usuario(); as u) {
+            <form class="perfil__formulario" [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+                <div class="perfil__fila">
+                    <div class="campo">
+                        <label class="campo__etiqueta" for="perfil-nombre">Nombre</label>
+                        <input
+                                id="perfil-nombre"
+                                class="campo__entrada"
+                                type="text"
+                                formControlName="nombre"
+                                maxlength="100"
+                                autocomplete="given-name"
+                                [attr.aria-invalid]="invalido('nombre')">
+
+                        @if (invalido('nombre')) {
+                            <small class="campo__error">El nombre es obligatorio.</small>
+                        }
+                    </div>
+
+                    <div class="campo">
+                        <label class="campo__etiqueta" for="perfil-apellido">Apellido</label>
+                        <input
+                                id="perfil-apellido"
+                                class="campo__entrada"
+                                type="text"
+                                formControlName="apellido"
+                                maxlength="100"
+                                autocomplete="family-name"
+                                [attr.aria-invalid]="invalido('apellido')">
+
+                        @if (invalido('apellido')) {
+                            <small class="campo__error">El apellido es obligatorio.</small>
+                        }
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label class="campo__etiqueta" for="perfil-correo">Correo electrónico</label>
+                    <input
+                            id="perfil-correo"
+                            class="campo__entrada"
+                            type="email"
+                            [value]="u.correo"
+                            disabled>
+                </div>
+
+                <div class="campo">
+                    <label class="campo__etiqueta" for="perfil-telefono">Teléfono</label>
+                    <input
+                            id="perfil-telefono"
+                            class="campo__entrada"
+                            type="tel"
+                            formControlName="telefono"
+                            maxlength="20"
+                            autocomplete="tel"
+                            [attr.aria-invalid]="invalido('telefono')">
+
+                    @if (invalido('telefono')) {
+                        <small class="campo__error">El teléfono no puede superar 20 caracteres.</small>
+                    }
+                </div>
+
+                <div class="perfil__datos">
+                    <span class="insignia">{{ etiquetaRol() }}</span>
+                    <span
+                            class="insignia"
+                            [class.insignia--activa]="estaActiva()"
+                            [class.insignia--inactiva]="!estaActiva()">
+            {{ u.estadoCuenta }}
+          </span>
+                </div>
+
+                <div class="perfil__acciones">
+                    <button class="boton boton--relleno" type="submit" [disabled]="guardando()">
+                        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+                    </button>
+
+                    @if (estaActiva()) {
+                        <button
+                                class="boton boton--borde"
+                                type="button"
+                                [disabled]="guardando()"
+                                (click)="confirmandoDesactivar.set(true)">
+                            Desactivar cuenta
+                        </button>
+                    }
+                </div>
+            </form>
+        } @else if (!error()) {
+            <p class="pagina__estado">No se encontró información del perfil.</p>
+        }
+    </section>
+</div>
+
+<app-dialogo-confirmacion
+        [abierto]="confirmandoDesactivar()"
+        titulo="Desactivar cuenta"
+        mensaje="¿Deseas desactivar tu cuenta? Podrás reactivarla más adelante desde la pantalla de inicio de sesión."
+        textoConfirmar="Desactivar"
+        [peligro]="true"
+        [cargando]="guardando()"
+        (confirmar)="desactivar()"
+        (cancelar)="confirmandoDesactivar.set(false)" />

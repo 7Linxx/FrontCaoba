@@ -1,0 +1,34 @@
+@if (abierto()) {
+    <div class="fondo" (click)="alCancelar()">
+        <div
+                class="dialogo"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="dialogo-titulo"
+                aria-describedby="dialogo-mensaje"
+                (click)="$event.stopPropagation()">
+            <h2 id="dialogo-titulo" class="dialogo__titulo">{{ titulo() }}</h2>
+            <p id="dialogo-mensaje" class="dialogo__mensaje">{{ mensaje() }}</p>
+
+            <div class="dialogo__acciones">
+                <button
+                        class="boton boton--compacto boton--borde"
+                        type="button"
+                        [disabled]="cargando()"
+                        (click)="alCancelar()">
+                    Cancelar
+                </button>
+
+                <button
+                        class="boton boton--compacto"
+                        type="button"
+                        [class.boton--peligro]="peligro()"
+                        [class.boton--relleno]="!peligro()"
+                        [disabled]="cargando()"
+                        (click)="confirmar.emit()">
+                    {{ cargando() ? 'Procesando…' : textoConfirmar() }}
+                </button>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,129 @@
+:host {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: block;
+}
+
+.navbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    height: var(--altura-navbar);
+    padding: 0 clamp(1rem, 3.8vw, 3.1rem);
+    color: #fff;
+    background: rgb(58 79 65 / 0.9);
+}
+
+.navbar__marca {
+    display: flex;
+    flex: none;
+}
+
+.navbar__marca img {
+    width: auto;
+    height: 44px;
+}
+
+.navbar__navegacion {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-width: 0;
+}
+
+.navbar__lista {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.navbar__cuenta {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.navbar__cuenta .boton {
+    min-height: 44px;
+    font-size: clamp(1rem, 1.6vw, 1.5rem);
+}
+
+.navbar__enlace {
+    display: inline-block;
+    padding-bottom: 2px;
+    font: 400 clamp(1.25rem, 2.2vw, 2rem) / 1.1 var(--fuente-titulo);
+    color: #fff;
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.navbar__enlace:hover {
+    border-bottom-color: rgb(155 128 97 / 0.6);
+}
+
+.navbar__enlace--activo {
+    border-bottom-color: var(--color-tan);
+}
+
+.navbar__enlace--deshabilitado {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.navbar__enlace--deshabilitado:hover {
+    border-bottom-color: transparent;
+}
+
+.navbar__menu {
+    display: none;
+    margin-left: auto;
+    padding: 0.5rem;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.navbar__menu-linea {
+    display: block;
+    width: 26px;
+    height: 2px;
+    margin: 5px 0;
+    background: var(--color-crema);
+}
+
+@media (max-width: 1000px) {
+    .navbar__menu {
+        display: block;
+    }
+
+    .navbar__navegacion {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem clamp(1rem, 3.8vw, 3.1rem) 1.5rem;
+        background: rgb(58 79 65 / 0.97);
+    }
+
+    .navbar__navegacion--abierta {
+        display: flex;
+    }
+
+    .navbar__lista {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

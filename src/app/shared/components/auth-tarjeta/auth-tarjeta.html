@@ -1,0 +1,11 @@
+<main class="fondo">
+    <div class="tarjeta" [class.tarjeta--invertida]="!formularioIzquierda()">
+        <section class="panel panel--formulario">
+            <ng-content select="[panel-formulario]" />
+        </section>
+
+        <section class="panel panel--info">
+            <ng-content select="[panel-info]" />
+        </section>
+    </div>
+</main>

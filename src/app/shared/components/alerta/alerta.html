@@ -1,0 +1,7 @@
+<div
+        class="alerta"
+        [class.alerta--exito]="tipo() === 'exito'"
+        [class.alerta--claro]="fondo() === 'claro'"
+        [attr.role]="tipo() === 'error' ? 'alert' : 'status'">
+    <ng-content />
+</div>
