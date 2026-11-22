@@ -44,16 +44,19 @@
                 </li>
             }
 
-            @if (auth.puedeVerReservasYReportes()) {
+            @if (puedeVerReservas()) {
                 <li>
-          <span
-                  class="navbar__enlace navbar__enlace--deshabilitado"
-                  role="link"
-                  aria-disabled="true"
-                  title="Próximamente">
-            Reservas
-          </span>
+                    <a
+                            class="navbar__enlace"
+                            routerLink="/reservas"
+                            routerLinkActive="navbar__enlace--activo"
+                            (click)="cerrarMenu()">
+                        Reservas
+                    </a>
                 </li>
+            }
+
+            @if (puedeVerReportes()) {
                 <li>
           <span
                   class="navbar__enlace navbar__enlace--deshabilitado"
