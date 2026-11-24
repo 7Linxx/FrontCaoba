@@ -1,0 +1,59 @@
+.dona {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 0;
+}
+
+.dona__svg {
+    flex: none;
+    width: min(220px, 100%);
+    height: auto;
+}
+
+.dona__fondo {
+    stroke: rgb(58 79 65 / 0.1);
+}
+
+.dona__total {
+    font: 400 36px var(--fuente-titulo);
+    fill: var(--color-verde);
+}
+
+.dona__unidad {
+    font: 400 11px var(--fuente-texto);
+    fill: var(--color-tan);
+}
+
+.dona__leyenda {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-width: 220px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: 400 1rem/1.3 var(--fuente-texto);
+    color: var(--color-verde);
+}
+
+.dona__leyenda li {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.dona__color {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 50%;
+}
+
+.dona__porcentaje {
+    min-width: 3.5rem;
+    text-align: right;
+    color: var(--color-tan);
+}

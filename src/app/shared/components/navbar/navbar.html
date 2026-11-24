@@ -58,13 +58,13 @@
 
             @if (puedeVerReportes()) {
                 <li>
-          <span
-                  class="navbar__enlace navbar__enlace--deshabilitado"
-                  role="link"
-                  aria-disabled="true"
-                  title="Próximamente">
-            Reportes
-          </span>
+                    <a
+                            class="navbar__enlace"
+                            routerLink="/reportes"
+                            routerLinkActive="navbar__enlace--activo"
+                            (click)="cerrarMenu()">
+                        Reportes
+                    </a>
                 </li>
             }
         </ul>

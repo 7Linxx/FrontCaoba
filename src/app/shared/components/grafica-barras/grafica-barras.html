@@ -1,0 +1,48 @@
+<figure class="barras">
+    <svg
+            class="barras__svg"
+            [attr.viewBox]="'0 0 ' + anchoVista + ' ' + altoVista"
+            preserveAspectRatio="xMidYMid meet"
+            role="img"
+            [attr.aria-label]="descripcion()">
+        @for (linea of lineas(); track $index) {
+            <line
+                    class="barras__linea"
+                    [attr.x1]="margenIzq"
+                    [attr.x2]="anchoVista - margenDer"
+                    [attr.y1]="linea.y"
+                    [attr.y2]="linea.y" />
+
+            <text
+                    class="barras__texto"
+                    [attr.x]="margenIzq - 6"
+                    [attr.y]="linea.y"
+                    text-anchor="end"
+                    dominant-baseline="middle">
+                {{ linea.valor }}
+            </text>
+        }
+
+        @for (barra of barras(); track $index) {
+            <rect
+                    class="barras__barra"
+                    rx="4"
+                    [attr.x]="barra.x"
+                    [attr.y]="barra.y"
+                    [attr.width]="barra.ancho"
+                    [attr.height]="barra.alto">
+                <title>{{ barra.etiqueta }}: {{ barra.valor }}</title>
+            </rect>
+
+            @if (barra.mostrarEtiqueta) {
+                <text
+                        class="barras__texto"
+                        text-anchor="middle"
+                        [attr.x]="barra.xEtiqueta"
+                        [attr.y]="yEtiqueta">
+                    {{ barra.etiqueta }}
+                </text>
+            }
+        }
+    </svg>
+</figure>

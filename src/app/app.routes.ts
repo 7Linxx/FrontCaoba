@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { adminGuard, authGuard, rolGuard } from './core/auth/auth.guard';
-import { ROLES_RESERVAS } from './core/config/permisos';
+import { ROLES_REPORTES, ROLES_RESERVAS } from './core/config/permisos';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'inicio', pathMatch: 'full' },
@@ -64,7 +64,13 @@ export const routes: Routes = [
         loadComponent: () =>
             import('./features/reservas/reservas/reservas').then((m) => m.Reservas),
       },
-      // reportes
+      {
+        path: 'reportes',
+        title: 'Reportes | CAOBA',
+        canActivate: [rolGuard(...ROLES_REPORTES)],
+        loadComponent: () =>
+            import('./features/reportes/reportes/reportes').then((m) => m.Reportes),
+      },
     ],
   },
 

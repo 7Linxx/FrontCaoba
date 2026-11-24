@@ -1,0 +1,152 @@
+<div class="pagina__contenido reportes">
+    <header>
+        <p class="pagina__etiqueta">
+            {{ modo() === 'anfitrion' ? 'INDICADORES DE RESERVAS' : 'INDICADORES DE USUARIOS' }}
+        </p>
+        <h1 class="pagina__titulo">Reportes</h1>
+        <p class="pagina__texto">
+            {{
+                modo() === 'anfitrion'
+                    ? 'Resumen de las reservas que han recibido tus alojamientos.'
+                    : 'Seguimiento de los usuarios registrados en CAOBA.'
+            }}
+        </p>
+    </header>
+
+    @if (modo(); as m) {
+        @if (error()) {
+            <app-alerta fondo="claro">{{ error() }}</app-alerta>
+        }
+
+        @if (cargando()) {
+            <section class="tarjeta-clara">
+                <p class="pagina__estado">Consultando reportes…</p>
+            </section>
+        } @else if (error()) {
+            <section class="tarjeta-clara">
+                <div class="pagina__estado">
+                    <p>No fue posible cargar los reportes.</p>
+                    <button
+                            class="boton boton--compacto boton--borde reportes__reintentar"
+                            type="button"
+                            (click)="cargar()">
+                        Reintentar
+                    </button>
+                </div>
+            </section>
+        } @else if (m === 'administrador') {
+            <div class="estadisticas">
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Usuarios registrados</span>
+                    <strong class="estadistica__valor">{{ totalUsuarios() }}</strong>
+                </article>
+
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Registros en el último mes</span>
+                    <strong class="estadistica__valor">{{ nuevosMes() }}</strong>
+                </article>
+
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Registros en el último año</span>
+                    <strong class="estadistica__valor">{{ nuevosAnio() }}</strong>
+                </article>
+            </div>
+
+            <div class="reportes__rejilla">
+                <section class="tarjeta-clara">
+                    <h2 class="pagina__subtitulo">Usuarios por rol</h2>
+
+                    @if (datosRoles().length > 0) {
+                        <app-grafica-dona
+                                [datos]="datosRoles()"
+                                descripcion="Distribución de usuarios por rol"
+                                unidad="usuarios" />
+                    } @else {
+                        <p class="pagina__estado">Aún no hay usuarios registrados.</p>
+                    }
+                </section>
+
+                <section class="tarjeta-clara">
+                    <h2 class="pagina__subtitulo">Registros del último año</h2>
+
+                    @if (datosAnio().length > 0) {
+                        <app-grafica-barras
+                                [datos]="datosAnio()"
+                                descripcion="Usuarios registrados por mes durante el último año" />
+                    } @else {
+                        <p class="pagina__estado">No hay registros en el último año.</p>
+                    }
+                </section>
+
+                <section class="tarjeta-clara reportes__ancha">
+                    <h2 class="pagina__subtitulo">Registros del último mes</h2>
+
+                    @if (datosMes().length > 0) {
+                        <app-grafica-barras
+                                [datos]="datosMes()"
+                                descripcion="Usuarios registrados por día durante el último mes" />
+                    } @else {
+                        <p class="pagina__estado">No hay registros en el último mes.</p>
+                    }
+                </section>
+            </div>
+        } @else if (resumen(); as r) {
+            <div class="estadisticas">
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Reservas recibidas</span>
+                    <strong class="estadistica__valor">{{ r.total }}</strong>
+                </article>
+
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Ingresos estimados (sin canceladas)</span>
+                    <strong class="estadistica__valor">
+                        {{ r.ingresosEstimados | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}
+                    </strong>
+                </article>
+            </div>
+
+            <div class="reportes__rejilla">
+                <section class="tarjeta-clara">
+                    <h2 class="pagina__subtitulo">Reservas por estado</h2>
+
+                    @if (r.total > 0) {
+                        <app-grafica-dona
+                                [datos]="r.porEstado"
+                                descripcion="Distribución de reservas por estado"
+                                unidad="reservas" />
+                    } @else {
+                        <p class="pagina__estado">Todavía no has recibido reservas.</p>
+                    }
+                </section>
+
+                <section class="tarjeta-clara">
+                    <h2 class="pagina__subtitulo">Reservas por alojamiento</h2>
+
+                    @if (r.porAlojamiento.length > 0) {
+                        <ul class="ranking">
+                            @for (alojamiento of r.porAlojamiento; track alojamiento.etiqueta) {
+                                <li class="ranking__fila">
+                                    <span class="ranking__nombre">{{ alojamiento.etiqueta }}</span>
+
+                                    <span class="ranking__barra">
+                    <span
+                            class="ranking__relleno"
+                            [style.width.%]="porcentajeAlojamiento(alojamiento.valor)"></span>
+                  </span>
+
+                                    <strong>{{ alojamiento.valor }}</strong>
+                                </li>
+                            }
+                        </ul>
+                    } @else {
+                        <p class="pagina__estado">No hay reservas vigentes.</p>
+                    }
+                </section>
+            </div>
+        }
+    } @else {
+        <section class="tarjeta-clara">
+            <p class="pagina__estado">Tu rol no tiene reportes disponibles.</p>
+        </section>
+    }
+</div>

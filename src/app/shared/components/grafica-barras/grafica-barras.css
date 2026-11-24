@@ -1,0 +1,28 @@
+.barras {
+    margin: 0;
+}
+
+.barras__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.barras__linea {
+    stroke: rgb(58 79 65 / 0.15);
+    stroke-width: 1;
+}
+
+.barras__barra {
+    fill: var(--color-verde);
+    transition: fill 0.2s;
+}
+
+.barras__barra:hover {
+    fill: var(--color-tan);
+}
+
+.barras__texto {
+    font: 400 11px var(--fuente-texto);
+    fill: var(--color-tan);
+}

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap, tap, throwError } from 'rxjs';
@@ -10,10 +10,31 @@ import {
   MensajeRespuesta,
   RegistroSolicitud,
   RestablecerSolicitud,
-  ValidacionCodigoRespuesta,
 } from '../../models/auth.model';
 import { Usuario, normalizarRol } from '../../models/usuario.model';
+import { TIEMPO_MAXIMO_MS } from '../http/timeout.interceptor';
 import { TokenService } from './token.service';
+
+
+function aMensaje(texto: string): MensajeRespuesta {
+  const limpio = (texto ?? '').trim();
+
+  try {
+    const valor: unknown = JSON.parse(limpio);
+
+    if (typeof valor === 'string') {
+      return { mensaje: valor };
+    }
+
+    if (valor && typeof valor === 'object' && 'mensaje' in valor) {
+      return { mensaje: String((valor as { mensaje: unknown }).mensaje) };
+    }
+  } catch {
+    /* era texto simple */
+  }
+
+  return { mensaje: limpio };
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -52,19 +73,31 @@ export class AuthService {
     return this.http.post<Usuario>(`${this.api}/registro`, datos);
   }
 
+  /** El envío del correo puede tardar más que una consulta normal, por eso tiene su propio límite. */
   solicitarRecuperacion(correo: string): Observable<MensajeRespuesta> {
-    return this.http.post<MensajeRespuesta>(`${this.api}/recuperacion`, { correo });
+    return this.http
+        .post(
+            `${this.api}/recuperacion`,
+            { correo },
+            {
+              responseType: 'text',
+              context: new HttpContext().set(TIEMPO_MAXIMO_MS, environment.tiempoMaximoCorreoMs),
+            },
+        )
+        .pipe(map(aMensaje));
   }
 
-  validarCodigoRecuperacion(correo: string, token: string): Observable<ValidacionCodigoRespuesta> {
-    return this.http.post<ValidacionCodigoRespuesta>(`${this.api}/restablecer/validar`, {
-      correo,
-      token,
-    });
+  /** Solo importa que el servidor acepte el código; la respuesta es texto simple. */
+  validarCodigoRecuperacion(correo: string, token: string): Observable<void> {
+    return this.http
+        .post(`${this.api}/restablecer/validar`, { correo, token }, { responseType: 'text' })
+        .pipe(map(() => undefined));
   }
 
   restablecerContrasena(datos: RestablecerSolicitud): Observable<MensajeRespuesta> {
-    return this.http.post<MensajeRespuesta>(`${this.api}/restablecer`, datos);
+    return this.http
+        .post(`${this.api}/restablecer`, datos, { responseType: 'text' })
+        .pipe(map(aMensaje));
   }
 
   cargarPerfil(): Observable<Usuario> {

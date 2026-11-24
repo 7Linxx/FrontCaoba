@@ -1,0 +1,41 @@
+<figure class="dona">
+    <svg class="dona__svg" viewBox="0 0 200 200" role="img" [attr.aria-label]="descripcion()">
+        <circle class="dona__fondo" cx="100" cy="100" [attr.r]="radio" fill="none" stroke-width="28" />
+
+        <g transform="rotate(-90 100 100)">
+            @for (segmento of segmentos(); track $index) {
+                @if (segmento.valor > 0) {
+                    <circle
+                            cx="100"
+                            cy="100"
+                            [attr.r]="radio"
+                            fill="none"
+                            stroke-width="28"
+                            [style.stroke]="segmento.color"
+                            [attr.stroke-dasharray]="segmento.largo + ' ' + (circunferencia - segmento.largo)"
+                            [attr.stroke-dashoffset]="segmento.desplazamiento">
+                        <title>{{ segmento.etiqueta }}: {{ segmento.valor }}</title>
+                    </circle>
+                }
+            }
+        </g>
+
+        <text class="dona__total" x="100" y="98" text-anchor="middle" dominant-baseline="central">
+            {{ total() }}
+        </text>
+        <text class="dona__unidad" x="100" y="124" text-anchor="middle">{{ unidad() }}</text>
+    </svg>
+
+    <figcaption>
+        <ul class="dona__leyenda">
+            @for (segmento of segmentos(); track $index) {
+                <li>
+                    <span class="dona__color" [style.background]="segmento.color"></span>
+                    <span>{{ segmento.etiqueta }}</span>
+                    <strong>{{ segmento.valor }}</strong>
+                    <span class="dona__porcentaje">{{ segmento.porcentaje | number: '1.0-1' }} %</span>
+                </li>
+            }
+        </ul>
+    </figcaption>
+</figure>
