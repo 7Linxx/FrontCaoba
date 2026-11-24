@@ -18,12 +18,28 @@ import { FormatoReporte, ReportesService } from '../reportes.service';
 
 type ModoReportes = 'administrador' | 'anfitrion';
 
-/** Reportes que el back sabe exportar (nombre = {reporte} en la URL). */
-const REPORTES_DESCARGABLES = [
-  { id: 'usuariosPorRol', etiqueta: 'Usuarios por rol' },
-  { id: 'usuariosUltimoMes', etiqueta: 'Registros del último mes' },
-  { id: 'usuariosUltimoAnio', etiqueta: 'Registros del último año' },
-] as const;
+interface ReporteDescargable {
+  /** Nombre del reporte; también es el nombre del archivo descargado. */
+  id: string;
+  /** Ruta en el back, después de /api/reporte */
+  ruta: string;
+  etiqueta: string;
+}
+
+/** Reportes que el back sabe exportar, según el rol. */
+const DESCARGAS_ADMINISTRADOR: ReporteDescargable[] = [
+  { id: 'usuariosPorRol', ruta: 'usuariosPorRol', etiqueta: 'Usuarios por rol' },
+  { id: 'usuariosUltimoMes', ruta: 'usuariosUltimoMes', etiqueta: 'Registros del último mes' },
+  { id: 'usuariosUltimoAnio', ruta: 'usuariosUltimoAnio', etiqueta: 'Registros del último año' },
+];
+
+const DESCARGAS_ANFITRION: ReporteDescargable[] = [
+  {
+    id: 'misReservasPorEstado',
+    ruta: 'anfitrion/misReservasPorEstado',
+    etiqueta: 'Mis reservas por estado',
+  },
+];
 
 function suma(valores: number[]): number {
   return valores.reduce((total, valor) => total + valor, 0);
@@ -65,8 +81,14 @@ export class Reportes {
   protected readonly resumen = signal<ResumenReservasAnfitrion | null>(null);
 
   // Descargas
-  protected readonly reportesDescargables = REPORTES_DESCARGABLES;
-  protected readonly reporteElegido = signal<string>(REPORTES_DESCARGABLES[0].id);
+  protected readonly reportesDescargables = computed<ReporteDescargable[]>(() =>
+      this.modo() === 'anfitrion' ? DESCARGAS_ANFITRION : DESCARGAS_ADMINISTRADOR,
+  );
+  private readonly idReporteElegido = signal('');
+  protected readonly reporteElegido = computed<ReporteDescargable>(() => {
+    const lista = this.reportesDescargables();
+    return lista.find((r) => r.id === this.idReporteElegido()) ?? lista[0];
+  });
   protected readonly descargando = signal<FormatoReporte | null>(null);
   protected readonly errorDescarga = signal('');
 
@@ -127,7 +149,7 @@ export class Reportes {
   }
 
   protected elegirReporte(evento: Event): void {
-    this.reporteElegido.set((evento.target as HTMLSelectElement).value);
+    this.idReporteElegido.set((evento.target as HTMLSelectElement).value);
   }
 
   protected descargar(formato: FormatoReporte): void {
@@ -138,16 +160,17 @@ export class Reportes {
     this.errorDescarga.set('');
 
     this.reportes
-        .descargar(reporte, formato)
+        .descargar(reporte.ruta, formato)
         .pipe(finalize(() => this.descargando.set(null)))
         .subscribe({
-          next: (archivo) => this.guardarArchivo(archivo, `${reporte}.${formato === 'pdf' ? 'pdf' : 'xlsx'}`),
+          next: (archivo) =>
+              this.guardarArchivo(archivo, `${reporte.id}.${formato === 'pdf' ? 'pdf' : 'xlsx'}`),
           error: (e) =>
               this.errorDescarga.set(
                   mensajeError(e, 'No fue posible descargar el reporte. Inténtalo de nuevo.', {
                     fijos: {
                       401: 'Tu sesión expiró. Ingresa nuevamente.',
-                      403: 'No tienes permisos para descargar reportes.',
+                      403: 'No tienes permisos para descargar este reporte.',
                       404: 'Este reporte no está disponible para descargar.',
                     },
                   }),

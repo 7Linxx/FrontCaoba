@@ -39,9 +39,8 @@ export class ReportesService {
         return this.reservas.reservasRecibidas().pipe(map(resumir));
     }
 
-    /** Descarga el reporte como archivo: GET /api/reporte/{reporte}/pdf|excel */
-    descargar(reporte: string, formato: FormatoReporte): Observable<Blob> {
-        return this.http.get(`${this.api}/${reporte}/${formato}`, { responseType: 'blob' });
+    descargar(ruta: string, formato: FormatoReporte): Observable<Blob> {
+        return this.http.get(`${this.api}/${ruta}/${formato}`, { responseType: 'blob' });
     }
 }
 
