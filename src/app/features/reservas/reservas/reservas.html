@@ -1,0 +1,110 @@
+<div class="pagina__contenido reservas">
+    <header>
+        <p class="pagina__etiqueta">{{ etiqueta() }}</p>
+        <h1 class="pagina__titulo">Reservas</h1>
+        <p class="pagina__texto">{{ descripcion() }}</p>
+    </header>
+
+    @if (modo(); as m) {
+        @if (error()) {
+            <app-alerta fondo="claro">{{ error() }}</app-alerta>
+        }
+
+        @if (mensaje()) {
+            <app-alerta tipo="exito" fondo="claro">{{ mensaje() }}</app-alerta>
+        }
+
+        <div class="estadisticas">
+            <article class="estadistica">
+                <span class="estadistica__etiqueta">Reservas totales</span>
+                <strong class="estadistica__valor">{{ total() }}</strong>
+            </article>
+
+            <article class="estadistica">
+                <span class="estadistica__etiqueta">Confirmadas</span>
+                <strong class="estadistica__valor">{{ confirmadas() }}</strong>
+            </article>
+
+            <article class="estadistica">
+                <span class="estadistica__etiqueta">Finalizadas</span>
+                <strong class="estadistica__valor">{{ finalizadas() }}</strong>
+            </article>
+
+            <article class="estadistica">
+                <span class="estadistica__etiqueta">Canceladas</span>
+                <strong class="estadistica__valor">{{ canceladas() }}</strong>
+            </article>
+        </div>
+
+        <section class="tarjeta-clara">
+            <h2 class="pagina__subtitulo">
+                {{ m === 'huesped' ? 'Mis reservas' : 'Reservas de mis alojamientos' }}
+            </h2>
+
+            @if (cargando()) {
+                <p class="pagina__estado">Consultando reservas…</p>
+            } @else if (reservas().length === 0) {
+                <div class="pagina__estado">
+                    @if (error()) {
+                        <p>No fue posible cargar las reservas.</p>
+                        <button class="boton boton--compacto boton--borde reservas__reintentar" type="button" (click)="cargar()">
+                            Reintentar
+                        </button>
+                    } @else if (m === 'huesped') {
+                        <p>Aún no tienes reservas.</p>
+                    } @else {
+                        <p>Todavía no has recibido reservas.</p>
+                    }
+                </div>
+            } @else {
+                <app-reservas-tabla
+                        [reservas]="reservas()"
+                        [modo]="m"
+                        (detalleSolicitado)="verDetalle($event)" />
+            }
+        </section>
+    } @else {
+        <section class="tarjeta-clara">
+            <p class="pagina__estado">Tu rol no tiene una vista de reservas.</p>
+        </section>
+    }
+</div>
+
+@if (seleccionada(); as reserva) {
+    <app-reserva-detalle
+            [reserva]="reserva"
+            [puedeCancelar]="reserva.estado === 'CONFIRMADA'"
+            (cerrar)="cerrarDetalle()"
+            (cancelar)="solicitarCancelacion(reserva)" />
+}
+
+<app-dialogo-confirmacion
+        [abierto]="cancelando() !== null"
+        titulo="Cancelar reserva"
+        [mensaje]="textoCancelacion()"
+        textoConfirmar="Cancelar reserva"
+        textoCancelar="Volver"
+        [peligro]="true"
+        [cargando]="procesando()"
+        (confirmar)="confirmarCancelacion()"
+        (cancelar)="cerrarCancelacion()">
+    <div class="campo sobre-claro">
+        <label class="campo__etiqueta" for="motivo-cancelacion">Motivo de la cancelación</label>
+
+        <textarea
+                id="motivo-cancelacion"
+                class="campo__entrada"
+                rows="3"
+                maxlength="500"
+                [formControl]="motivo"
+                [attr.aria-invalid]="motivoInvalido()"></textarea>
+
+        @if (motivoInvalido()) {
+            <small class="campo__error">El motivo de la cancelación es obligatorio.</small>
+        }
+
+        @if (errorCancelacion()) {
+            <app-alerta fondo="claro">{{ errorCancelacion() }}</app-alerta>
+        }
+    </div>
+</app-dialogo-confirmacion>

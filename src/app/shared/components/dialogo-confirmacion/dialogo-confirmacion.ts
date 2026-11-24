@@ -1,6 +1,5 @@
 import { Component, input, output } from '@angular/core';
 
-/** Ventana de confirmación para acciones delicadas (desactivar cuenta, cambiar estado). */
 @Component({
   selector: 'app-dialogo-confirmacion',
   templateUrl: './dialogo-confirmacion.html',
@@ -12,6 +11,7 @@ export class DialogoConfirmacion {
   readonly titulo = input.required<string>();
   readonly mensaje = input('');
   readonly textoConfirmar = input('Confirmar');
+  readonly textoCancelar = input('Cancelar');
   readonly peligro = input(false);
   readonly cargando = input(false);
 

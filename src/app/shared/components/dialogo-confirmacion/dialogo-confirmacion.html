@@ -10,13 +10,15 @@
             <h2 id="dialogo-titulo" class="dialogo__titulo">{{ titulo() }}</h2>
             <p id="dialogo-mensaje" class="dialogo__mensaje">{{ mensaje() }}</p>
 
+            <ng-content />
+
             <div class="dialogo__acciones">
                 <button
                         class="boton boton--compacto boton--borde"
                         type="button"
                         [disabled]="cargando()"
                         (click)="alCancelar()">
-                    Cancelar
+                    {{ textoCancelar() }}
                 </button>
 
                 <button

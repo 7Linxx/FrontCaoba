@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
-import { adminGuard, authGuard } from './core/auth/auth.guard';
+import { adminGuard, authGuard, rolGuard } from './core/auth/auth.guard';
+import { ROLES_RESERVAS } from './core/config/permisos';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'inicio', pathMatch: 'full' },
@@ -54,9 +55,16 @@ export const routes: Routes = [
         path: 'administracion/usuarios',
         title: 'Gestión de usuarios | CAOBA',
         canActivate: [adminGuard],
-        loadComponent: () =>
-            import('./features/admin/usuarios/usuarios').then((m) => m.Usuarios),
+        loadComponent: () => import('./features/admin/usuarios/usuarios').then((m) => m.Usuarios),
       },
+      {
+        path: 'reservas',
+        title: 'Reservas | CAOBA',
+        canActivate: [rolGuard(...ROLES_RESERVAS)],
+        loadComponent: () =>
+            import('./features/reservas/reservas/reservas').then((m) => m.Reservas),
+      },
+      // reportes
     ],
   },
 

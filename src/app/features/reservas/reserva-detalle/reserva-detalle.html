@@ -1,0 +1,87 @@
+<div class="fondo" (click)="cerrar.emit()">
+    <section
+            class="detalle"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="detalle-titulo"
+            (click)="$event.stopPropagation()">
+        <header class="detalle__cabecera">
+            <div>
+                <p class="pagina__etiqueta">DETALLE DE LA RESERVA</p>
+                <h2 id="detalle-titulo" class="detalle__titulo">{{ reserva().alojamiento }}</h2>
+            </div>
+
+            <span
+                    class="insignia"
+                    [class.insignia--activa]="confirmada()"
+                    [class.insignia--inactiva]="cancelada()">
+        {{ etiqueta() }}
+      </span>
+        </header>
+
+        <dl class="detalle__datos">
+            <div>
+                <dt>Entrada</dt>
+                <dd>{{ reserva().fechaEntrada | date: 'EEEE d MMM y' }}</dd>
+            </div>
+
+            <div>
+                <dt>Salida</dt>
+                <dd>{{ reserva().fechaSalida | date: 'EEEE d MMM y' }}</dd>
+            </div>
+
+            <div>
+                <dt>Fecha de solicitud</dt>
+                <dd>{{ reserva().fechaSolicitud | date: 'd MMM y, h:mm a' }}</dd>
+            </div>
+
+            <div>
+                <dt>Precio total</dt>
+                <dd>{{ reserva().precioTotal | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+            </div>
+
+            <div>
+                <dt>Comprobante</dt>
+                <dd>{{ reserva().comprobante }}</dd>
+            </div>
+        </dl>
+
+        <div class="detalle__bloque">
+            <h3>Política de cancelación: {{ reserva().politicaCancelacion.nombre }}</h3>
+            <p>{{ reserva().politicaCancelacion.descripcion }}</p>
+            <p class="detalle__nota">
+                Devolución según la política: {{ reserva().politicaCancelacion.porcentajeDevolucion }} %
+            </p>
+        </div>
+
+        @if (cancelada()) {
+            <div class="detalle__bloque">
+                <h3>Reserva cancelada</h3>
+                <p><strong>Motivo:</strong> {{ reserva().motivoCancelacion }}</p>
+
+                @if (reserva().fechaCancelacion) {
+                    <p>
+                        <strong>Fecha:</strong>
+                        {{ reserva().fechaCancelacion | date: 'd MMM y, h:mm a' }}
+                    </p>
+                }
+
+                @if (reserva().canceladaPor) {
+                    <p><strong>Cancelada por:</strong> {{ reserva().canceladaPor }}</p>
+                }
+            </div>
+        }
+
+        <div class="detalle__acciones">
+            <button class="boton boton--compacto boton--borde" type="button" (click)="cerrar.emit()">
+                Cerrar
+            </button>
+
+            @if (puedeCancelar()) {
+                <button class="boton boton--compacto boton--peligro" type="button" (click)="cancelar.emit()">
+                    Cancelar reserva
+                </button>
+            }
+        </div>
+    </section>
+</div>
