@@ -20,6 +20,13 @@
         </header>
 
         <dl class="detalle__datos">
+            @if (esAnfitrion()) {
+                <div>
+                    <dt>Huésped</dt>
+                    <dd>{{ reserva().huesped }}</dd>
+                </div>
+            }
+
             <div>
                 <dt>Entrada</dt>
                 <dd>{{ reserva().fechaEntrada | date: 'EEEE d MMM y' }}</dd>
@@ -36,9 +43,20 @@
             </div>
 
             <div>
-                <dt>Precio total</dt>
+                <dt>Precio total pagado</dt>
                 <dd>{{ reserva().precioTotal | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
             </div>
+
+            @if (esAnfitrion()) {
+                <div>
+                    <dt>Dinero recibido</dt>
+                    @if (cancelada()) {
+                        <dd>—</dd>
+                    } @else {
+                        <dd>{{ reserva().ingresoAnfitrion | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+                    }
+                </div>
+            }
 
             <div>
                 <dt>Comprobante</dt>
@@ -50,7 +68,9 @@
             <h3>Política de cancelación: {{ reserva().politicaCancelacion.nombre }}</h3>
             <p>{{ reserva().politicaCancelacion.descripcion }}</p>
             <p class="detalle__nota">
-                Devolución según la política: {{ reserva().politicaCancelacion.porcentajeDevolucion }} %
+                Con al menos {{ reserva().politicaCancelacion.diasLimiteReembolso }} días de
+                anticipación se devuelve el {{ reserva().politicaCancelacion.pctReembolsoEnPlazo }} %;
+                después de ese plazo, el {{ reserva().politicaCancelacion.pctReembolsoFueraPlazo }} %.
             </p>
         </div>
 

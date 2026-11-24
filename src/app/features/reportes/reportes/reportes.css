@@ -16,6 +16,57 @@
     margin-top: 0.75rem;
 }
 
+/* Descarga del reporte (al final de la página) */
+.reportes__descargas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+.reportes__selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    font: 500 0.95rem/1.2 var(--fuente-texto);
+    color: var(--color-verde);
+}
+
+.reportes__selector select {
+    min-width: min(100%, 280px);
+    padding: 0.6rem 2rem 0.6rem 1rem;
+    font: 400 1rem/1.2 var(--fuente-texto);
+    color: var(--color-verde);
+    background-color: var(--color-marfil, #f6f0eb);
+    border: 1px solid var(--color-verde);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.reportes__selector select:focus-visible {
+    outline: 2px solid var(--color-verde);
+    outline-offset: 2px;
+}
+
+.reportes__botones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.reportes__botones .boton {
+    min-width: 12rem;
+}
+
+.reportes__botones .boton:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
 /* Ranking de reservas por alojamiento */
 .ranking {
     display: flex;

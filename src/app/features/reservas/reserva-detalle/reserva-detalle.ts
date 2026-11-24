@@ -14,6 +14,8 @@ import { Reserva, etiquetaEstadoReserva } from '../../../models/reserva.model';
 export class ReservaDetalle {
   readonly reserva = input.required<Reserva>();
   readonly puedeCancelar = input(false);
+  /** Si es true, muestra el huésped y el dinero que recibe el anfitrión. */
+  readonly esAnfitrion = input(false);
 
   readonly cerrar = output<void>();
   readonly cancelar = output<void>();

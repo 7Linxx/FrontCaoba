@@ -14,55 +14,107 @@
             <app-alerta tipo="exito" fondo="claro">{{ mensaje() }}</app-alerta>
         }
 
-        <div class="estadisticas">
-            <article class="estadistica">
-                <span class="estadistica__etiqueta">Reservas totales</span>
-                <strong class="estadistica__valor">{{ total() }}</strong>
-            </article>
+        @if (m === 'huesped') {
+            <div class="reservas__pestanas">
+                <button
+                        class="boton boton--compacto"
+                        type="button"
+                        [class.boton--relleno]="vista() === 'reservas'"
+                        [class.boton--borde]="vista() !== 'reservas'"
+                        (click)="cambiarVista('reservas')">
+                    Mis reservas
+                </button>
 
-            <article class="estadistica">
-                <span class="estadistica__etiqueta">Confirmadas</span>
-                <strong class="estadistica__valor">{{ confirmadas() }}</strong>
-            </article>
+                <button
+                        class="boton boton--compacto"
+                        type="button"
+                        [class.boton--relleno]="vista() === 'cotizar'"
+                        [class.boton--borde]="vista() !== 'cotizar'"
+                        (click)="cambiarVista('cotizar')">
+                    Cotizar un alojamiento
+                </button>
+            </div>
+        }
 
-            <article class="estadistica">
-                <span class="estadistica__etiqueta">Finalizadas</span>
-                <strong class="estadistica__valor">{{ finalizadas() }}</strong>
-            </article>
+        @if (m === 'huesped' && vista() === 'cotizar') {
+            <app-cotizador (reservaCreada)="alCrearReserva($event)" />
+        } @else {
+            <div class="estadisticas">
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Reservas totales</span>
+                    <strong class="estadistica__valor">{{ total() }}</strong>
+                </article>
 
-            <article class="estadistica">
-                <span class="estadistica__etiqueta">Canceladas</span>
-                <strong class="estadistica__valor">{{ canceladas() }}</strong>
-            </article>
-        </div>
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Confirmadas</span>
+                    <strong class="estadistica__valor">{{ confirmadas() }}</strong>
+                </article>
 
-        <section class="tarjeta-clara">
-            <h2 class="pagina__subtitulo">
-                {{ m === 'huesped' ? 'Mis reservas' : 'Reservas de mis alojamientos' }}
-            </h2>
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Finalizadas</span>
+                    <strong class="estadistica__valor">{{ finalizadas() }}</strong>
+                </article>
 
-            @if (cargando()) {
-                <p class="pagina__estado">Consultando reservas…</p>
-            } @else if (reservas().length === 0) {
-                <div class="pagina__estado">
-                    @if (error()) {
-                        <p>No fue posible cargar las reservas.</p>
-                        <button class="boton boton--compacto boton--borde reservas__reintentar" type="button" (click)="cargar()">
-                            Reintentar
-                        </button>
-                    } @else if (m === 'huesped') {
-                        <p>Aún no tienes reservas.</p>
-                    } @else {
-                        <p>Todavía no has recibido reservas.</p>
-                    }
-                </div>
-            } @else {
-                <app-reservas-tabla
-                        [reservas]="reservas()"
-                        [modo]="m"
-                        (detalleSolicitado)="verDetalle($event)" />
-            }
-        </section>
+                <article class="estadistica">
+                    <span class="estadistica__etiqueta">Canceladas</span>
+                    <strong class="estadistica__valor">{{ canceladas() }}</strong>
+                </article>
+
+                @if (m === 'anfitrion') {
+                    <article class="estadistica">
+                        <span class="estadistica__etiqueta">Dinero recibido</span>
+                        <strong class="estadistica__valor">
+                            {{ ingresos() | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}
+                        </strong>
+                    </article>
+                }
+            </div>
+
+            <section class="tarjeta-clara">
+                <h2 class="pagina__subtitulo">
+                    {{ m === 'huesped' ? 'Mis reservas' : 'Reservas de mis alojamientos' }}
+                </h2>
+
+                @if (reservas().length > 0) {
+                    <label class="reservas__filtro">
+                        Filtrar por estado
+                        <select
+                                class="campo__entrada"
+                                [value]="filtro()"
+                                (change)="cambiarFiltro($any($event.target).value)">
+                            <option value="TODAS">Todas</option>
+                            <option value="CONFIRMADA">Confirmadas</option>
+                            <option value="FINALIZADA">Finalizadas</option>
+                            <option value="CANCELADA">Canceladas</option>
+                        </select>
+                    </label>
+                }
+
+                @if (cargando()) {
+                    <p class="pagina__estado">Consultando reservas…</p>
+                } @else if (reservas().length === 0) {
+                    <div class="pagina__estado">
+                        @if (error()) {
+                            <p>No fue posible cargar las reservas.</p>
+                            <button class="boton boton--compacto boton--borde reservas__reintentar" type="button" (click)="cargar()">
+                                Reintentar
+                            </button>
+                        } @else if (m === 'huesped') {
+                            <p>Aún no tienes reservas. Usa "Cotizar un alojamiento" para hacer la primera.</p>
+                        } @else {
+                            <p>Todavía no has recibido reservas.</p>
+                        }
+                    </div>
+                } @else if (visibles().length === 0) {
+                    <p class="pagina__estado">No hay reservas con ese estado.</p>
+                } @else {
+                    <app-reservas-tabla
+                            [reservas]="visibles()"
+                            [modo]="m"
+                            (detalleSolicitado)="verDetalle($event)" />
+                }
+            </section>
+        }
     } @else {
         <section class="tarjeta-clara">
             <p class="pagina__estado">Tu rol no tiene una vista de reservas.</p>
@@ -73,7 +125,8 @@
 @if (seleccionada(); as reserva) {
     <app-reserva-detalle
             [reserva]="reserva"
-            [puedeCancelar]="reserva.estado === 'CONFIRMADA'"
+            [esAnfitrion]="modo() === 'anfitrion'"
+            [puedeCancelar]="modo() === 'huesped' && reserva.estado === 'CONFIRMADA'"
             (cerrar)="cerrarDetalle()"
             (cancelar)="solicitarCancelacion(reserva)" />
 }

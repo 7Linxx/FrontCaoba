@@ -90,6 +90,41 @@
                     }
                 </section>
             </div>
+
+            <section class="tarjeta-clara reportes__descargas" aria-labelledby="titulo-descargas">
+                <h2 id="titulo-descargas" class="pagina__subtitulo">Descargar reporte</h2>
+
+                <label class="reportes__selector">
+                    <span>Reporte</span>
+                    <select [value]="reporteElegido()" (change)="elegirReporte($event)">
+                        @for (reporte of reportesDescargables; track reporte.id) {
+                            <option [value]="reporte.id">{{ reporte.etiqueta }}</option>
+                        }
+                    </select>
+                </label>
+
+                @if (errorDescarga()) {
+                    <app-alerta fondo="claro">{{ errorDescarga() }}</app-alerta>
+                }
+
+                <div class="reportes__botones">
+                    <button
+                            class="boton boton--relleno"
+                            type="button"
+                            [disabled]="descargando() !== null"
+                            (click)="descargar('pdf')">
+                        {{ descargando() === 'pdf' ? 'Generando PDF…' : 'Descargar PDF' }}
+                    </button>
+
+                    <button
+                            class="boton boton--borde"
+                            type="button"
+                            [disabled]="descargando() !== null"
+                            (click)="descargar('excel')">
+                        {{ descargando() === 'excel' ? 'Generando Excel…' : 'Descargar Excel' }}
+                    </button>
+                </div>
+            </section>
         } @else if (resumen(); as r) {
             <div class="estadisticas">
                 <article class="estadistica">

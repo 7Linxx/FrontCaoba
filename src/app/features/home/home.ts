@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { RouterLink } from '@angular/router';
 import { IMAGENES } from '../../core/config/imagenes';
 
 const DESCRIPCION_CARACTERISTICA =
@@ -7,6 +7,7 @@ const DESCRIPCION_CARACTERISTICA =
 
 @Component({
   selector: 'app-home',
+  imports: [RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

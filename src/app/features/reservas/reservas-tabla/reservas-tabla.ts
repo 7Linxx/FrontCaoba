@@ -26,4 +26,10 @@ export class ReservasTabla {
   protected cancelada(reserva: Reserva): boolean {
     return reserva.estado === 'CANCELADA';
   }
+
+  /** Huésped: lo que pagó. Anfitrión: lo que recibió (nada si la reserva se canceló). */
+  protected monto(reserva: Reserva): number | null {
+    if (this.modo() === 'huesped') return reserva.precioTotal;
+    return reserva.estado === 'CANCELADA' ? null : reserva.ingresoAnfitrion;
+  }
 }

@@ -1,0 +1,188 @@
+@if (seleccionado(); as aloj) {
+    <section class="tarjeta-clara cotizador__detalle">
+        <button class="boton boton--compacto boton--borde" type="button" (click)="volver()">
+            ← Volver a la lista
+        </button>
+
+        <header>
+            <p class="pagina__etiqueta">COTIZAR ALOJAMIENTO</p>
+            <h2 class="pagina__subtitulo">{{ aloj.titulo }}</h2>
+            <p>{{ aloj.descripcion }}</p>
+        </header>
+
+        <dl class="cotizador__especificaciones">
+            <div>
+                <dt>Ubicación</dt>
+                <dd>{{ aloj.ciudad }} · {{ aloj.direccion }}</dd>
+            </div>
+            <div>
+                <dt>Tipo</dt>
+                <dd>{{ aloj.tipoAlojamiento }}</dd>
+            </div>
+            <div>
+                <dt>Capacidad</dt>
+                <dd>{{ aloj.capacidad }} huéspedes</dd>
+            </div>
+            <div>
+                <dt>Anfitrión</dt>
+                <dd>{{ aloj.nombreAnfitrion }}</dd>
+            </div>
+            <div>
+                <dt>Precio por noche</dt>
+                <dd>{{ aloj.precioNoche | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+            </div>
+            <div>
+                <dt>Tarifa de limpieza</dt>
+                <dd>{{ aloj.pctTarifaLimpieza ?? 0 }} %</dd>
+            </div>
+            <div>
+                <dt>Descuento</dt>
+                <dd>{{ aloj.pctDescuento ?? 0 }} %</dd>
+            </div>
+        </dl>
+
+        @if (aloj.politicaCancelacion; as p) {
+            <div class="cotizador__politica">
+                <h3>Política de cancelación: {{ p.nombre }}</h3>
+                <p>{{ p.descripcion }}</p>
+                <p>
+                    Con al menos {{ p.diasLimiteReembolso }} días de anticipación se devuelve el
+                    {{ p.pctReembolsoEnPlazo }} %; después de ese plazo, el {{ p.pctReembolsoFueraPlazo }} %.
+                </p>
+            </div>
+        }
+
+        <div class="cotizador__formulario" [formGroup]="form">
+            <label>
+                Entrada
+                <input class="campo__entrada" type="date" formControlName="fechaEntrada" [min]="minimo">
+            </label>
+
+            <label>
+                Salida
+                <input
+                        class="campo__entrada"
+                        type="date"
+                        formControlName="fechaSalida"
+                        [min]="form.controls.fechaEntrada.value || minimo">
+            </label>
+
+            <label>
+                Huéspedes (máx. {{ aloj.capacidad }})
+                <input
+                        class="campo__entrada"
+                        type="number"
+                        formControlName="numeroHuespedes"
+                        min="1"
+                        [max]="aloj.capacidad">
+            </label>
+        </div>
+
+        @if (aloj.serviciosAdicionales.length > 0) {
+            <fieldset class="cotizador__servicios">
+                <legend>Servicios adicionales</legend>
+
+                @for (s of aloj.serviciosAdicionales; track s.idServicioAdicional) {
+                    <label>
+                        <input
+                                type="checkbox"
+                                [checked]="serviciosElegidos().includes(s.idServicioAdicional)"
+                                (change)="alternarServicio(s.idServicioAdicional)">
+                        {{ s.nombre }} ({{ s.costo | currency: 'COP' : 'symbol-narrow' : '1.0-0' }})
+                    </label>
+                }
+            </fieldset>
+        }
+
+        @if (error()) {
+            <app-alerta fondo="claro">{{ error() }}</app-alerta>
+        }
+
+        <button
+                class="boton boton--borde"
+                type="button"
+                [disabled]="cotizando() || fase() !== 'libre'"
+                (click)="cotizar()">
+            {{ cotizando() ? 'Calculando…' : 'Cotizar' }}
+        </button>
+
+        @if (cotizacion(); as c) {
+            <section class="cotizador__desglose">
+                <h3>Valor final a pagar</h3>
+
+                <dl>
+                    <div>
+                        <dt>{{ c.numeroNoches }} noches × {{ c.precioNoche | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dt>
+                        <dd>{{ c.precioBaseTotal | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+                    </div>
+                    <div>
+                        <dt>Tarifa de limpieza ({{ c.pctTarifaLimpieza }} %)</dt>
+                        <dd>{{ c.montoLimpieza | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+                    </div>
+                    <div>
+                        <dt>Descuento ({{ c.pctDescuento }} %)</dt>
+                        <dd>−{{ c.montoDescuento | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+                    </div>
+                    <div>
+                        <dt>Servicios adicionales</dt>
+                        <dd>{{ c.montoServAdicionales | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+                    </div>
+                    <div>
+                        <dt>Tarifa de servicio ({{ c.pctTarifaServicio }} %)</dt>
+                        <dd>{{ c.montoTarifaServicio | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+                    </div>
+                    <div class="cotizador__total">
+                        <dt>Total</dt>
+                        <dd>{{ c.total | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</dd>
+                    </div>
+                </dl>
+
+                <button class="boton boton--relleno" type="button" (click)="pedirPago()">
+                    Pagar y confirmar reserva
+                </button>
+            </section>
+        }
+    </section>
+} @else {
+    <section class="tarjeta-clara">
+        <h2 class="pagina__subtitulo">Alojamientos disponibles</h2>
+
+        @if (cargando()) {
+            <p class="pagina__estado">Consultando alojamientos…</p>
+        } @else if (errorLista()) {
+            <app-alerta fondo="claro">{{ errorLista() }}</app-alerta>
+            <button class="boton boton--compacto boton--borde" type="button" (click)="cargarLista()">
+                Reintentar
+            </button>
+        } @else if (alojamientos().length === 0) {
+            <p class="pagina__estado">No hay alojamientos activos por ahora.</p>
+        } @else {
+            <div class="cotizador__lista">
+                @for (a of alojamientos(); track a.idAlojamiento) {
+                    <article class="cotizador__tarjeta">
+                        <h3>{{ a.titulo }}</h3>
+                        <p class="cotizador__meta">{{ a.ciudad }} · {{ a.tipoAlojamiento }} · hasta {{ a.capacidad }} huéspedes</p>
+                        <p class="cotizador__descripcion">{{ a.descripcion }}</p>
+                        <p class="cotizador__precio">
+                            {{ a.precioNoche | currency: 'COP' : 'symbol-narrow' : '1.0-0' }} <span>por noche</span>
+                        </p>
+                        <button class="boton boton--compacto boton--relleno" type="button" (click)="seleccionar(a)">
+                            Ver y cotizar
+                        </button>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+}
+
+<app-dialogo-confirmacion
+        [abierto]="pagoAbierto()"
+        titulo="Pagar y confirmar la reserva"
+        [mensaje]="textoPago()"
+        textoConfirmar="Pagar y confirmar"
+        textoCancelar="Volver"
+        [peligro]="false"
+        [cargando]="fase() !== 'libre'"
+        (confirmar)="confirmarPago()"
+        (cancelar)="cancelarPago()" />

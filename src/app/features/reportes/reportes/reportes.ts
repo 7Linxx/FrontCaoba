@@ -14,9 +14,16 @@ import { ETIQUETA_ROL, normalizarRol } from '../../../models/usuario.model';
 import { Alerta } from '../../../shared/components/alerta/alerta';
 import { GraficaBarras } from '../../../shared/components/grafica-barras/grafica-barras';
 import { GraficaDona } from '../../../shared/components/grafica-dona/grafica-dona';
-import { ReportesService } from '../reportes.service';
+import { FormatoReporte, ReportesService } from '../reportes.service';
 
 type ModoReportes = 'administrador' | 'anfitrion';
+
+/** Reportes que el back sabe exportar (nombre = {reporte} en la URL). */
+const REPORTES_DESCARGABLES = [
+  { id: 'usuariosPorRol', etiqueta: 'Usuarios por rol' },
+  { id: 'usuariosUltimoMes', etiqueta: 'Registros del último mes' },
+  { id: 'usuariosUltimoAnio', etiqueta: 'Registros del último año' },
+] as const;
 
 function suma(valores: number[]): number {
   return valores.reduce((total, valor) => total + valor, 0);
@@ -56,6 +63,12 @@ export class Reportes {
 
   // Anfitrión
   protected readonly resumen = signal<ResumenReservasAnfitrion | null>(null);
+
+  // Descargas
+  protected readonly reportesDescargables = REPORTES_DESCARGABLES;
+  protected readonly reporteElegido = signal<string>(REPORTES_DESCARGABLES[0].id);
+  protected readonly descargando = signal<FormatoReporte | null>(null);
+  protected readonly errorDescarga = signal('');
 
   protected readonly totalUsuarios = computed(() => suma(this.roles().map((r) => r.cantidad)));
   protected readonly nuevosMes = computed(() => suma(this.ultimoMes().map((p) => p.cantidad)));
@@ -113,8 +126,49 @@ export class Reportes {
         });
   }
 
+  protected elegirReporte(evento: Event): void {
+    this.reporteElegido.set((evento.target as HTMLSelectElement).value);
+  }
+
+  protected descargar(formato: FormatoReporte): void {
+    if (this.descargando()) return;
+
+    const reporte = this.reporteElegido();
+    this.descargando.set(formato);
+    this.errorDescarga.set('');
+
+    this.reportes
+        .descargar(reporte, formato)
+        .pipe(finalize(() => this.descargando.set(null)))
+        .subscribe({
+          next: (archivo) => this.guardarArchivo(archivo, `${reporte}.${formato === 'pdf' ? 'pdf' : 'xlsx'}`),
+          error: (e) =>
+              this.errorDescarga.set(
+                  mensajeError(e, 'No fue posible descargar el reporte. Inténtalo de nuevo.', {
+                    fijos: {
+                      401: 'Tu sesión expiró. Ingresa nuevamente.',
+                      403: 'No tienes permisos para descargar reportes.',
+                      404: 'Este reporte no está disponible para descargar.',
+                    },
+                  }),
+              ),
+        });
+  }
+
   protected porcentajeAlojamiento(valor: number): number {
     return (valor / this.maximoAlojamiento()) * 100;
+  }
+
+  /** Dispara la descarga en el navegador a partir del archivo recibido. */
+  private guardarArchivo(archivo: Blob, nombre: string): void {
+    const url = URL.createObjectURL(archivo);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = nombre;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    URL.revokeObjectURL(url);
   }
 
   private fallar(e: unknown): void {

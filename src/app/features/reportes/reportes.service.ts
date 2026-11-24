@@ -13,6 +13,8 @@ import { ReservasService } from '../reservas/reservas.service';
 
 const ESTADOS: EstadoReserva[] = ['CONFIRMADA', 'FINALIZADA', 'CANCELADA'];
 
+export type FormatoReporte = 'pdf' | 'excel';
+
 @Injectable({ providedIn: 'root' })
 export class ReportesService {
     private readonly http = inject(HttpClient);
@@ -35,6 +37,11 @@ export class ReportesService {
     /** Resumen del anfitrión, calculado con las reservas que ha recibido. */
     resumenReservasAnfitrion(): Observable<ResumenReservasAnfitrion> {
         return this.reservas.reservasRecibidas().pipe(map(resumir));
+    }
+
+    /** Descarga el reporte como archivo: GET /api/reporte/{reporte}/pdf|excel */
+    descargar(reporte: string, formato: FormatoReporte): Observable<Blob> {
+        return this.http.get(`${this.api}/${reporte}/${formato}`, { responseType: 'blob' });
     }
 }
 

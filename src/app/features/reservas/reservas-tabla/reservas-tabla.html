@@ -13,14 +13,11 @@
 
             @if (modo() === 'huesped') {
                 <th>Solicitud</th>
-                <th>Precio</th>
             }
 
+            <th>{{ modo() === 'anfitrion' ? 'Dinero recibido' : 'Precio' }}</th>
             <th>Estado</th>
-
-            @if (modo() === 'huesped') {
-                <th><span class="solo-lectores">Acciones</span></th>
-            }
+            <th><span class="solo-lectores">Acciones</span></th>
         </tr>
         </thead>
 
@@ -40,28 +37,33 @@
 
                     @if (modo() === 'huesped') {
                         <td>{{ reserva.fechaSolicitud | date: 'd MMM y, h:mm a' }}</td>
-                        <td>{{ reserva.precioTotal | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</td>
                     }
 
                     <td>
-            <span
-                    class="insignia"
-                    [class.insignia--activa]="confirmada(reserva)"
-                    [class.insignia--inactiva]="cancelada(reserva)">
-              {{ etiqueta(reserva) }}
-            </span>
+                        @if (monto(reserva); as valor) {
+                            {{ valor | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}
+                        } @else {
+                            —
+                        }
                     </td>
 
-                    @if (modo() === 'huesped') {
-                        <td>
-                            <button
-                                    class="boton boton--compacto boton--borde"
-                                    type="button"
-                                    (click)="detalleSolicitado.emit(reserva)">
-                                Ver detalle
-                            </button>
-                        </td>
-                    }
+                    <td>
+                        <span
+                                class="insignia"
+                                [class.insignia--activa]="confirmada(reserva)"
+                                [class.insignia--inactiva]="cancelada(reserva)">
+                            {{ etiqueta(reserva) }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <button
+                                class="boton boton--compacto boton--borde"
+                                type="button"
+                                (click)="detalleSolicitado.emit(reserva)">
+                            Ver detalle
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>

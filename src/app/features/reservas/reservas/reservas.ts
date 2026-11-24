@@ -7,9 +7,14 @@ import { mensajeError } from '../../../core/utils/mensaje-error';
 import { EstadoReserva, ModoReservas, Reserva } from '../../../models/reserva.model';
 import { Alerta } from '../../../shared/components/alerta/alerta';
 import { DialogoConfirmacion } from '../../../shared/components/dialogo-confirmacion/dialogo-confirmacion';
+import { Cotizador } from '../cotizador/cotizador';
 import { ReservaDetalle } from '../reserva-detalle/reserva-detalle';
 import { ReservasTabla } from '../reservas-tabla/reservas-tabla';
 import { ReservasService } from '../reservas.service';
+import { CurrencyPipe } from '@angular/common';
+
+type Vista = 'reservas' | 'cotizar';
+type FiltroEstado = 'TODAS' | EstadoReserva;
 
 const FORMATO_MONEDA = new Intl.NumberFormat('es-CO', {
   style: 'currency',
@@ -19,7 +24,7 @@ const FORMATO_MONEDA = new Intl.NumberFormat('es-CO', {
 
 @Component({
   selector: 'app-reservas',
-  imports: [ReactiveFormsModule, Alerta, DialogoConfirmacion, ReservasTabla, ReservaDetalle],
+  imports: [ReactiveFormsModule, CurrencyPipe, Alerta, DialogoConfirmacion, ReservasTabla, ReservaDetalle, Cotizador],
   templateUrl: './reservas.html',
   styleUrl: './reservas.css',
   host: { class: 'pagina' },
@@ -35,6 +40,9 @@ export class Reservas {
     if (rol === 'ANFITRION') return 'anfitrion';
     return null;
   });
+
+  protected readonly vista = signal<Vista>('reservas');
+  protected readonly filtro = signal<FiltroEstado>('TODAS');
 
   protected readonly reservas = signal<Reserva[]>([]);
   protected readonly cargando = signal(false);
@@ -52,20 +60,39 @@ export class Reservas {
     validators: [Validators.maxLength(500)],
   });
 
+  protected readonly visibles = computed(() => {
+    const filtro = this.filtro();
+    return filtro === 'TODAS'
+        ? this.reservas()
+        : this.reservas().filter((reserva) => reserva.estado === filtro);
+  });
+
   protected readonly total = computed(() => this.reservas().length);
   protected readonly confirmadas = computed(() => this.contar('CONFIRMADA'));
   protected readonly finalizadas = computed(() => this.contar('FINALIZADA'));
   protected readonly canceladas = computed(() => this.contar('CANCELADA'));
 
-  protected readonly etiqueta = computed(() =>
-      this.modo() === 'anfitrion' ? 'RESERVAS RECIBIDAS' : 'HISTORIAL DE RESERVAS',
+  /** Dinero recibido por el anfitrión: todas las reservas que no fueron canceladas. */
+  protected readonly ingresos = computed(() =>
+      this.reservas()
+          .filter((reserva) => reserva.estado !== 'CANCELADA')
+          .reduce((suma, reserva) => suma + reserva.ingresoAnfitrion, 0),
   );
 
-  protected readonly descripcion = computed(() =>
-      this.modo() === 'anfitrion'
-          ? 'Consulta las reservas que han recibido tus alojamientos.'
-          : 'Consulta el estado de tus reservas, su detalle y cancela las que estén confirmadas.',
-  );
+  protected readonly etiqueta = computed(() => {
+    if (this.modo() === 'anfitrion') return 'RESERVAS RECIBIDAS';
+    return this.vista() === 'cotizar' ? 'COTIZAR Y RESERVAR' : 'HISTORIAL DE RESERVAS';
+  });
+
+  protected readonly descripcion = computed(() => {
+    if (this.modo() === 'anfitrion') {
+      return 'Consulta las reservas que han recibido tus alojamientos y el dinero recibido por cada una.';
+    }
+
+    return this.vista() === 'cotizar'
+        ? 'Elige un alojamiento, revisa sus especificaciones, cotiza tu estancia y confirma la reserva con el pago.'
+        : 'Consulta el estado de tus reservas, su detalle y cancela las que estén confirmadas.';
+  });
 
   protected readonly textoCancelacion = computed(() => {
     const reserva = this.cancelando();
@@ -102,6 +129,26 @@ export class Reservas {
         );
       },
     });
+  }
+
+  protected cambiarVista(vista: Vista): void {
+    this.mensaje.set('');
+    this.vista.set(vista);
+  }
+
+  protected cambiarFiltro(valor: string): void {
+    this.filtro.set(valor as FiltroEstado);
+  }
+
+  /** El pago simulado fue aprobado y el back confirmó la reserva. */
+  protected alCrearReserva(reserva: Reserva): void {
+    this.reservas.update((lista) => [reserva, ...lista]);
+    this.filtro.set('TODAS');
+    this.error.set('');
+    this.vista.set('reservas');
+    this.mensaje.set(
+        `Pago aprobado (simulado) y reserva confirmada. Tu comprobante es ${reserva.comprobante}.`,
+    );
   }
 
   protected verDetalle(reserva: Reserva): void {
@@ -146,7 +193,7 @@ export class Reservas {
     this.procesando.set(true);
 
     this.reservasService
-        .cancelar(reserva.idReserva, texto)
+        .cancelar(reserva, texto)
         .pipe(finalize(() => this.procesando.set(false)))
         .subscribe({
           next: ({ reserva: actualizada, montoDevolucion }) => {
